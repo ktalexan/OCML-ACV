@@ -1,0 +1,64 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>62018f10-a011-41fc-b8cc-fef6f7bc5f82</ProjectGuid>
+    <ProjectHome>
+    </ProjectHome>
+    <StartupFile>acvmlpy.py</StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <Name>acvmlpy</Name>
+    <RootNamespace>acvml360</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="acvgis_old.py" />
+    <Compile Include="ocml\acvgis.py" />
+    <Compile Include="ocml\acvml.py" />
+    <Compile Include="acvmlpy.py" />
+    <Compile Include="AreaProcessing\acv01_anaheim2018337p1.py" />
+    <Compile Include="AreaProcessing\acv02_anaheim2018338p1.py" />
+    <Compile Include="AreaProcessing\acv03_anaheim2018338p2.py" />
+    <Compile Include="AreaProcessing\acv04_ntustin2019088p2.py" />
+    <Compile Include="AreaProcessing\acv05_ntustin2019089p1.py" />
+    <Compile Include="AreaProcessing\acv06_ntustin2019090p1.py" />
+    <Compile Include="AreaProcessing\acv07_ntustin2019090p2.py" />
+    <Compile Include="AreaProcessing\acv08_ntustin2019090p3.py" />
+    <Compile Include="AreaProcessing\acv09_ntustin2019091p1.py" />
+    <Compile Include="AreaProcessing\acv10_ntustin2019091p2.py" />
+    <Compile Include="AreaProcessing\acv11_ntustin2019092p1.py" />
+    <Compile Include="AreaProcessing\acv12_ntustin2019093p1.py" />
+    <Compile Include="GisProcessing\ACVML_ArcGIS.py" />
+    <Compile Include="ocml\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="AreaProcessing\" />
+    <Folder Include="GisProcessing\" />
+    <Folder Include="ocml\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="OCML Object Classification Toolbox.pyt" />
+    <Content Include="ReadMe.md" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+  <!-- Uncomment the CoreCompile target to enable the Build command in
+       Visual Studio and specify your pre- and post-build commands in
+       the BeforeBuild and AfterBuild targets below. -->
+  <!--<Target Name="CoreCompile" />-->
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+</Project>

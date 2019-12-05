@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ArcGIS defaultAssembly="acvmlnet.dll"
+        defaultNamespace="acvmlnet"
+        xmlns="http://schemas.esri.com/DADF/Registry"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://schemas.esri.com/DADF/Registry file:///C:/Program%20Files/ArcGIS/Pro/bin/ArcGIS.Desktop.Framework.xsd">
+
+  <AddInInfo id="{581af3dc-3750-4d0a-a188-8602bcfed726}" version="1.0" desktopVersion="2.4.19948">
+    <Name>acvmlnet</Name>   
+    <Description>acvmlnet description</Description>
+    <Image>Images\AddinDesktop32.png</Image>
+    <Author>ktale</Author>
+    <Company>Acme</Company>
+    <Date>9/20/2019 9:33:07 PM, 2019</Date>
+    <Subject>Framework</Subject>
+    <!-- Note subject can be one or more of these topics:
+                    Content, Framework, Editing, Geodatabase, Geometry, Geoprocessing, Layouts, Map Authoring, Map Exploration -->
+  </AddInInfo>
+
+  <modules>
+    <insertModule id="acvmlnet_Module" className="Module1" autoLoad="false" caption="Module1">
+      <!-- uncomment to have the control hosted on a separate tab-->
+      <tabs>
+        <!--<tab id="acvmlnet_Tab1" caption="New Tab">
+          <group refID="acvmlnet_Group1"/>
+        </tab>-->
+      </tabs>
+              
+      <groups>
+        <!-- comment this out if you have no controls on the Addin tab to avoid
+              an empty group-->
+        <group id="acvmlnet_Group1" caption="Group 1" appearsOnAddInTab="true">
+          <!-- host controls within groups -->
+        </group>
+      </groups>
+      
+      <controls>
+        <!-- add your controls here -->
+      </controls> 
+      
+    </insertModule>
+  </modules>
+</ArcGIS>
