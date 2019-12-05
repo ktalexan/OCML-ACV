@@ -6,6 +6,7 @@ h2 {
 	padding: 10px;
 	font-weight: bold;
 }
+
 h2.toc {color: brown; background-color: transparent;}
 h2.function {color: darkgreen; background-color:limegreen; padding:10px;}
 h3 {color: green;}
