@@ -1,11 +1,28 @@
-import os
-import io
-import requests
-import json
-import geojson
-import cv2
 import glob
-import xlrd
+import http.client
+import io
+import json
 import math
-import hhtp.client
+import os
+import time
+from datetime import datetime, timedelta
+from decimal import Decimal
+
+import cv2
+import geojson
+import numpy as np
+import pandas as pd
 import pyproj
+import requests
+import xlrd
+import xlsxwriter as xlw
+from azure.storage.blob import BlockBlobService
+from GPSPhoto import gpsphoto
+from IPython.display import display
+from pandas.io.json import json_normalize
+from PIL import Image, ImageDraw, ImageFont
+from pytz import timezone
+from tqdm import tqdm
+
+# Set maximum number of http requests per page
+http.client._MAXHEADERS = 100000
