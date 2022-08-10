@@ -5,6 +5,7 @@ import json
 import math
 import os
 import time
+import uuid
 from datetime import datetime, timedelta
 from decimal import Decimal
 
@@ -17,7 +18,8 @@ import pyproj
 import requests
 import xlrd
 import xlsxwriter as xlw
-from azure.storage.blob import BlockBlobService
+from azure.storage.blob import (BlobClient, BlobServiceClient, ContainerClient,
+                                __version__)
 from GPSPhoto import gpsphoto
 from IPython.display import display
 from pandas.io.json import json_normalize

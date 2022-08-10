@@ -7,27 +7,37 @@
 # Preliminaries and Libraries #
 #-----------------------------#
 
+import glob
+import http.client
+import io
+import json
+import math
 # Importing the required libraries into the project
-import os, io, requests, json, geojson, cv2, glob, xlrd, math, http.client, pyproj
-import pandas as pd
+import os
+import time
+from datetime import datetime, timedelta
+from decimal import Decimal
+
+import cv2
+import geojson
 import matplotlib.pyplot as plt
 import numpy as np
-from decimal import Decimal
+import pandas as pd
+import pyproj
+import requests
+import xlrd
 import xlsxwriter as xlw
-from pandas.io.json import json_normalize
-from PIL import Image, ImageDraw, ImageFont
+from azure.storage.blob import BlockBlobService
 from GPSPhoto import gpsphoto
-from datetime import datetime, timedelta
-from pytz import timezone
-import time
-from tqdm import tqdm
 #from tqdm.auto import tqdm
 from IPython.display import display
-from azure.storage.blob import BlockBlobService
+from pandas.io.json import json_normalize
+from PIL import Image, ImageDraw, ImageFont
+from pytz import timezone
+from tqdm import tqdm
 
 # Set maximum number of http requests
 http.client._MAXHEADERS = 10000
-
 
 
 #===================#
@@ -50,8 +60,6 @@ class acvml(object):
     Example Class initialization:
         az = acvml(blobAccount, blobKey, apiRegion, apiKey, containerName)
     """
-
-    
 
     #---------- CLASS INITIAlIZATION FUNCTION ----------#
 
@@ -99,31 +107,25 @@ class acvml(object):
 
         # Get Dataset Info
         AnaheimList = ['anaheim2018337p1', 'anaheim2018338p1', 'anaheim2018ee8p2']
-        NTustinList = ['ntustin2019088p2', 'ntustin2019089p1', 'ntustin2019090p1', 'ntustin2019090p2', 'ntustin2019090p3', 
+        NTustinList = ['ntustin2019088p2', 'ntustin2019089p1', 'ntustin2019090p1', 'ntustin2019090p2', 'ntustin2019090p3',
                        'ntustin2019091p1', 'ntustin2019091p2', 'ntustin2019092p1', 'ntustin2019093p1']
         self.collectionArea = 'None'
         self.datasetID = 0
 
-        for i, a in enumerate(AnaheimList, start = 1):
+        for i, a in enumerate(AnaheimList, start=1):
             if a in self.containerName:
                 self.collectionArea = 'Anaheim'
                 self.datasetID = i
 
-        for i, a in enumerate(NTustinList, start = 4):
+        for i, a in enumerate(NTustinList, start=4):
             if a in self.containerName:
                 self.collectionArea = 'North Tustin'
                 self.datasetID = i
         return
 
-
-
-
     #========================================================================#
     # PRELIMINARY DATA TRANSFORMATION FUNCTIONS (NEEDED FOR OTHER FUNCTIONS) #
     #========================================================================#
-        
-
-
 
     #---------- Class Function: CheckDegrees ----------#
 
@@ -147,10 +149,6 @@ class acvml(object):
 
         return sumdeg
 
-
-
-
-
     #---------- Class Function: CheckCardinality ----------#
 
     def CheckCardinality(self, value):
@@ -167,32 +165,28 @@ class acvml(object):
 
         # Defining a cardinal directions dictionary to be used in the next function
         cardinalDictionary = {
-            'N0': [0, 5.625], 'NbE': [5.625, 16.875], 'NNE': [16.875, 28.125], 
-            'NEbN': [28.125, 39.375], 'NE': [39.375, 50.625], 'NEbE': [50.625, 61.875], 
-            'ENE': [61.875, 73.125], 'EbN': [73.125, 84.375], 'E': [84.375, 95.625], 
-            'EbS': [95.625, 106.875], 'ESE': [106.875, 118.125], 'SEbE': [118.125, 129.375], 
-            'SE': [129.375, 140.625], 'SEbS': [140.625, 151.875], 'SSE': [151.875, 163.125], 
-            'SbE': [163.125, 174.375], 'S': [174.375, 185.625], 'SbW': [185.625, 196.875], 
-            'SSW': [196.875, 208.125], 'SWbS': [208.125, 219.375], 'SW': [219.375, 230.625], 
-            'SWbW': [230.625, 241.875], 'WSW': [241.875, 253.125], 'WbS': [253.125, 264.375], 
-            'W': [264.375, 275.625], 'WbN': [275.625, 286.875], 'WNW': [286.875, 298.125], 
-            'NWbW': [298.125, 309.375], 'NW': [309.375, 320.625], 'NWbN': [320.625, 331.875], 
+            'N0': [0, 5.625], 'NbE': [5.625, 16.875], 'NNE': [16.875, 28.125],
+            'NEbN': [28.125, 39.375], 'NE': [39.375, 50.625], 'NEbE': [50.625, 61.875],
+            'ENE': [61.875, 73.125], 'EbN': [73.125, 84.375], 'E': [84.375, 95.625],
+            'EbS': [95.625, 106.875], 'ESE': [106.875, 118.125], 'SEbE': [118.125, 129.375],
+            'SE': [129.375, 140.625], 'SEbS': [140.625, 151.875], 'SSE': [151.875, 163.125],
+            'SbE': [163.125, 174.375], 'S': [174.375, 185.625], 'SbW': [185.625, 196.875],
+            'SSW': [196.875, 208.125], 'SWbS': [208.125, 219.375], 'SW': [219.375, 230.625],
+            'SWbW': [230.625, 241.875], 'WSW': [241.875, 253.125], 'WbS': [253.125, 264.375],
+            'W': [264.375, 275.625], 'WbN': [275.625, 286.875], 'WNW': [286.875, 298.125],
+            'NWbW': [298.125, 309.375], 'NW': [309.375, 320.625], 'NWbN': [320.625, 331.875],
             'NNW': [331.875, 343.125], 'NbW': [343.125, 354.375], 'N1': [354.375, 360.000001]
-            }
+        }
 
         # Loop direction ranges to find the appropriate range
         for direction in cardinalDictionary:
-            if cardinalDictionary[direction][0] <= round(value,3) < cardinalDictionary[direction][1]:
+            if cardinalDictionary[direction][0] <= round(value, 3) < cardinalDictionary[direction][1]:
                 if direction == 'N0' or direction == 'N1':
                     cardinalDir = 'N'
                 else:
                     cardinalDir = direction
 
         return cardinalDir
-
-
-
-
 
     #---------- Class Function: GetDirection ----------#
 
@@ -217,10 +211,6 @@ class acvml(object):
 
         return degout
 
-
-
-
-
     #---------- Class Function: ConvertStatePlane ----------#
 
     def ConvertStatePlane(self, xin, yin, zin):
@@ -240,15 +230,11 @@ class acvml(object):
         """
 
         # Setting preserve_units as True ensures we preserve the original coordinate units in feet.
-        inProj = pyproj.Proj(init = 'epsg:2230', preserve_units = True)
-        outProj = pyproj.Proj(init = 'epsg:4326')
+        inProj = pyproj.Proj(init='epsg:2230', preserve_units=True)
+        outProj = pyproj.Proj(init='epsg:4326')
         xout, yout, zout = pyproj.transform(inProj, outProj, xin, yin, zin)
 
         return (xout, yout, zout)
-
-
-
-
 
     #---------- Class Function: TimestampConvert ----------#
 
@@ -277,10 +263,10 @@ class acvml(object):
         # The day of the week
         day = timestamp / 86400
         # The hours, minutes, seconds, and mili-seconds parts
-        hours = Decimal(str(day))%1 * 86400 / 3600
-        minutes = Decimal(str(hours))%1 * 3600 / 60
-        seconds = Decimal(str(minutes))%1 * 60
-        msecs = Decimal(str(seconds))%1 * 10
+        hours = Decimal(str(day)) % 1 * 86400 / 3600
+        minutes = Decimal(str(hours)) % 1 * 3600 / 60
+        seconds = Decimal(str(minutes)) % 1 * 60
+        msecs = Decimal(str(seconds)) % 1 * 10
         hh, mm, ss, s = int(hours), int(minutes), int(seconds), int(msecs)
 
         # Construct the new datetime object (UTC)
@@ -290,13 +276,9 @@ class acvml(object):
 
         return dtobjpst
 
-
-
-
-
     #---------- Class Function: CheckBlobContainer ----------#
 
-    def CheckBlobContainer(self, containerName = None, create = True, publicAccess = 'blob'):
+    def CheckBlobContainer(self, containerName=None, create=True, publicAccess='blob'):
         """Check for the presence of a blob container in the account
         This function checks the Azure storage account whether or not a blob container (folder) exists or not.
         If the container exists, the program makes sure the publicAccess is set to the value of the function.
@@ -314,17 +296,18 @@ class acvml(object):
 
         # Check if the container is provided:
         if containerName is None:
-            container = self.containerName # if empty, revert to the default class container
-        else: container = containerName
+            container = self.containerName  # if empty, revert to the default class container
+        else:
+            container = containerName
 
         # Check if the container exist:
         if self.blobService.exists(container):
             # Making sure it has public blob-only access
-            self.blobService.set_container_acl(container, public_access = publicAccess)
+            self.blobService.set_container_acl(container, public_access=publicAccess)
             print('Container {} exists. Public access is set to {}'.format(container, publicAccess))
         elif create == True:
             # If the user indicated that create argument is true, then create a new container
-            self.blobService.create_container(container, public_access = publicAccess)
+            self.blobService.create_container(container, public_access=publicAccess)
             assert self.blobService.exists(container)
             print('Container {} does not exist. A new container is created with public_access set to {}'.format(container, publicAccess))
         else:
@@ -332,10 +315,6 @@ class acvml(object):
             print('Container {} does not exist. No changes are requested. Program is exiting.')
 
         return
-
-
-
-
 
     #---------- Class Function: CheckBlobMetadata ----------#
 
@@ -354,7 +333,7 @@ class acvml(object):
         containerList = self.get_blob_list()
         # Check if the blob container exists, and it has the right permissions
         self.CheckBlobContainer(self.containerName)
-        noImg = len(containerList) # Total number of images in blob container
+        noImg = len(containerList)  # Total number of images in blob container
         j = 0
 
         # Get the excel metadata from the first excel sheet
@@ -371,20 +350,13 @@ class acvml(object):
 
         return
 
-
-
-
-
     #=======================================#
     # PHOTOSPHERE IMAGE OPERATION FUNCTIONS #
     #=======================================#
-        
-
-
 
     #---------- Class Function: GetBlobList ----------#
 
-    def GetBlobList(self, containerName = None):
+    def GetBlobList(self, containerName=None):
         """List all blobs in Azure storage blob
         This function gets a list of all files in an Azure storage blob (by container folder name)
 
@@ -396,26 +368,22 @@ class acvml(object):
         Output
             blobList: the list of all files in the container
         """
-        
+
         # List the blobs in the container (from class initialization)
         if containerName is None:
             container = self.containerName
         else:
             container = containerName
-            
+
         blobList = []
         generator = self.blobService.list_blobs(container)
-        
+
         for blob in generator:
             blobList.append(blob)
-            
+
         print('Blob list for container {} created with {} blobs'.format(container, len(blobList)))
-        
+
         return blobList
-
-
-
-
 
     #---------- Class Function: GetObjectBounds ----------#
 
@@ -430,7 +398,7 @@ class acvml(object):
         Output
             bounds: the set of bounds expressed in bounding box coordinates (x, y, w, h)
         """
-            
+
         bounds = []
         nobj = jsonstring['NumberOfObjects']
 
@@ -443,13 +411,9 @@ class acvml(object):
                     {'y': jsonstring['y{}'.format(i+1)]},
                     {'w': jsonstring['w{}'.format(i+1)]},
                     {'h': jsonstring['h{}'.format(i+1)]}]
-                })
+            })
 
         return bounds
-
-
-
-
 
     #---------- Class Function: DrawBoundingBoxes ----------#
 
@@ -476,15 +440,11 @@ class acvml(object):
                 bound['vertices'][1]['y'],
                 bound['vertices'][0]['x'] + bound['vertices'][2]['w'],
                 bound['vertices'][1]['y'] + bound['vertices'][3]['h']
-                ], None, 'red')
+            ], None, 'red')
             draw.text((bound['vertices'][0]['x'] + 5, bound['vertices'][1]['y'] + 5),
-                bound['object'], fill = 'red', font = font)
-            
+                      bound['object'], fill='red', font=font)
+
         return image
-
-
-
-
 
     #---------- Class Function: WriteJSONFile ----------#
 
@@ -504,19 +464,12 @@ class acvml(object):
         filename = name + '.json'
         with open(filename, 'w') as fp:
             json.dump(data, fp)
-            
+
         return
-
-
-
-
 
     #=========================================================================#
     # MAIN FEATURE FUNCTIONS FOR IMAGE PROCESSING AND CLASSIFICATION ANALYSIS #
     #=========================================================================#
-        
-
-
 
     #---------- Class Function: UpdateBlobMetadata ----------#
 
@@ -531,19 +484,19 @@ class acvml(object):
         Output
             Nothing; performs operation in the blob container
         """
-        
+
         try:
             # Obtain the blob list of the container
             containerList = self.GetBlobList()
             # Check the container and it's permissions
             self.CheckBlobContainer(self.containerName)
-            noImg = len(containerList) # number of images in blob list
+            noImg = len(containerList)  # number of images in blob list
             print('Number of blobs in container: {}'.format(noImg))
 
             # Get the metadata from the excel table
             if self.metadata is not None:
                 xlMetadata = pd.read_excel(self.metadata, sheet_name=0)
-                
+
                 # Assign and extract the data variables
                 for i, img in enumerate(tqdm(containerList)):
                     imgName = img.name
@@ -555,9 +508,9 @@ class acvml(object):
                         xlcols['OriginEasting'],
                         xlcols['OriginNorthing'],
                         xlcols['OriginHeight']
-                        )
+                    )
                     # GPS sensor in the middle of the photosphere
-                    dirsensor = self.GetDirection(xlcols['DirectionEasting'],xlcols['DirectionNorthing'])
+                    dirsensor = self.GetDirection(xlcols['DirectionEasting'], xlcols['DirectionNorthing'])
                     # Get the direction from the edge of the photosphere (adding 180 degrees)
                     dirmov = self.CheckDegrees(dirsensor, 180)
 
@@ -572,7 +525,7 @@ class acvml(object):
                     jsonimg['DateTimeString'] = imgdt.strftime('%Y%m%d%H%M%S.%f').rstrip('0')
                     jsonimg['PhotosphereResolution'] = '8000 x 4000'
                     jsonimg['PhotosphereURL'] = '{}/{}'.format(self.blobBaseUrl_photospheres, xlcols['Filename'])
-                    jsonimg['GooglePhotosphere'] = 'https://www.google.com/maps/@?api=1&map_action=pano&viewpoint={},{}&heading={}'.format(str(lat), str(lon),str(dirmov))
+                    jsonimg['GooglePhotosphere'] = 'https://www.google.com/maps/@?api=1&map_action=pano&viewpoint={},{}&heading={}'.format(str(lat), str(lon), str(dirmov))
                     jsonimg['Longitude'] = lon
                     jsonimg['Latitude'] = lat
                     jsonimg['Altitude'] = alt
@@ -592,27 +545,21 @@ class acvml(object):
                     jsonimg['Omega'] = xlcols['Omega']
                     jsonimg['Phi'] = xlcols['Phi']
                     jsonimg['Kappa'] = xlcols['Kappa']
-                    
+
                     # populate the metadata dictionary
                     metastring = {}
                     for key in jsonimg.keys():
                         metastring[key] = str(jsonimg[key])
-                        
+
                     # Set the metadata dictionary as the Azure blob image's metadata
-                    self.blobService.set_blob_metadata(self.containerName,imgName, metastring)
-                    
+                    self.blobService.set_blob_metadata(self.containerName, imgName, metastring)
+
             return
-        
+
         except Exception as ex:
             print(ex.args[0])
 
-
-
-
-
-
     #---------- Class Function: ProcessCardinalImages ----------#
-
 
     def ProcessCardinalImages(self, blob):
         """Processes cardinal images from original photospheres
@@ -629,21 +576,21 @@ class acvml(object):
         Output
             Nothing; the results are processed and saved in containerOut storage blob.
         """
-        
+
         try:
-            
+
             imageName = blob.name
 
             # Getting the photosphere image metadata
             metaString = {}
-            
+
             if self.blobService.get_blob_metadata(self.containerName, imageName) is not {}:
                 metaString = self.blobService.get_blob_metadata(self.containerName, imageName)
-                fields = ['Direction', 'Longitude', 'Latitude', 'Altitude', 'Easting', 
-                          'Northing', 'Height', 'DirectionEasting', 'DirectionNorthing', 
-                          'DirectionHeight', 'UpEasting', 'UpNorthing', 'UpHeight', 'Roll', 
+                fields = ['Direction', 'Longitude', 'Latitude', 'Altitude', 'Easting',
+                          'Northing', 'Height', 'DirectionEasting', 'DirectionNorthing',
+                          'DirectionHeight', 'UpEasting', 'UpNorthing', 'UpHeight', 'Roll',
                           'Pitch', 'Yaw', 'Omega', 'Phi', 'Kappa']
-                
+
                 for field in fields:
                     metaString[field] = float(metaString[field])
 
@@ -672,7 +619,7 @@ class acvml(object):
                     cardinalImgName = '{}_{}_{}.jpg'.format(imageName.split('.jpg')[0], ncard + 1, cardinalLabel)
                     cmeta['CardinalImageName'] = cardinalImgName
                     cmeta['CardinalImageURL'] = '{}/{}'.format(self.blobBaseUrl_cardinal, cardinalImgName)
-                    cmeta['GoogleCardinal'] = 'https://www.google.com/maps/@?api=1&map_action=pano&viewpoint={},{}&heading={}'.format(str(cmeta['Latitude']), str(cmeta['Longitude']),str(cardinalDir))
+                    cmeta['GoogleCardinal'] = 'https://www.google.com/maps/@?api=1&map_action=pano&viewpoint={},{}&heading={}'.format(str(cmeta['Latitude']), str(cmeta['Longitude']), str(cardinalDir))
                     cmeta['CardinalNumber'] = ncard + 1
                     cmeta['CardinalDirection'] = cardinalDir
                     cmeta['CardinalDirectionLabel'] = cardinalLabel
@@ -681,16 +628,16 @@ class acvml(object):
                     url = self.visionBaseUrl + 'analyze'
                     headers = self.headers
                     params = {"visualFeatures": "Categories,Tags,Description,ImageType,Color,Objects"}
-                    response = requests.post(url, headers = headers, params = params, data = cardinalArray)
+                    response = requests.post(url, headers=headers, params=params, data=cardinalArray)
                     response.raise_for_status()
                     responsejson = response.json()
-                    
+
                     # Create and populate json response captions fields
                     if 'captions' in responsejson['description']:
                         if responsejson['description']['captions']:
                             cmeta['Caption'] = responsejson['description']['captions'][0]['text']
                             cmeta['CaptionConfidence'] = responsejson['description']['captions'][0]['confidence']
-                    
+
                     # Create and populate json response metadata fields
                     if 'metadata' in responsejson:
                         cmeta['ImageWidth'] = responsejson['metadata']['width']
@@ -709,7 +656,6 @@ class acvml(object):
                         elif responsejson['color']['dominantColors'] is None:
                             cmeta['DominantColors'] = ''
 
-
                     # Create and populate json response number of categories fields
                     if 'categories' in responsejson:
                         lcat = len(responsejson['categories'])
@@ -719,7 +665,6 @@ class acvml(object):
                                 catName = 'Category{}{}'.format(cat.capitalize(), str(ncat + 1))
                                 cmeta[catName] = obj[cat]
 
-                    
                     # Populate the tags fields from the cognitive vision response
                     if 'tags' in responsejson:
                         ltags = len(responsejson['tags'])
@@ -729,13 +674,12 @@ class acvml(object):
                             cmeta['TagConfidence{}'.format(str(ntag + 1))] = obj['confidence']
                             for tag in obj:
                                 tagName = 'Tag{}{}'.format(tag.capitalize(), str(ntag + 1))
-                                cmeta[tagName] = obj[tag]                        
+                                cmeta[tagName] = obj[tag]
                     if 'tags' in responsejson['description']:
                         dtagsjoin = ','.join(responsejson['description']['tags'])
                         if dtagsjoin:
                             cmeta['DescriptionTags'] = dtagsjoin
-                        
-                        
+
                     # Populate the objects fields from the cognitive vision response
                     if 'objects' in responsejson:
                         lobj = len(responsejson['objects'])
@@ -788,21 +732,17 @@ class acvml(object):
                         cardinalMetaBlob[key] = str(cmeta[key])
 
                     self.blobService.create_blob_from_bytes(
-                        container_name = self.cardinalName,
-                        blob_name = cardinalImgName,
-                        blob = taggedArray,
-                        metadata = cardinalMetaBlob
-                        )
-                    
+                        container_name=self.cardinalName,
+                        blob_name=cardinalImgName,
+                        blob=taggedArray,
+                        metadata=cardinalMetaBlob
+                    )
+
             return
-        
+
         except Exception as ex:
             # Print the exception message
             print(ex.args[0])
-
-
-
-
 
     #---------- Class Function: GeoJSONFromCardinals ----------#
 
@@ -819,11 +759,11 @@ class acvml(object):
             fcresponse: a GeoJSON Feature Collection containing all GeoJSON features and geopoints with all analyses.
         """
         try:
-            
+
             featList = []
             self.CheckBlobContainer(self.cardinalName)
             blobList = self.GetBlobList(self.cardinalName)
-            
+
             # Loop through the blob list and populate the dictionary json string
             for blob in tqdm(blobList, desc='Processing Cardinals:', unit=' blobs'):
                 if self.blobService.get_blob_metadata(self.cardinalName, blob.name) is not {}:
@@ -831,32 +771,33 @@ class acvml(object):
                     # All original fields in the Azure blob metadata are stored as strings. Some manipulations are required.
 
                     # Fields that need to be converted to float numbers
-                    fieldsFloat = ['Direction', 'Longitude', 'Latitude', 'Altitude', 'Easting', 'Northing', 
-                                   'Height', 'DirectionEasting', 'DirectionNorthing', 'DirectionHeight', 
-                                   'UpEasting', 'UpNorthing', 'UpHeight', 'Roll', 'Pitch', 'Yaw', 'Omega', 
+                    fieldsFloat = ['Direction', 'Longitude', 'Latitude', 'Altitude', 'Easting', 'Northing',
+                                   'Height', 'DirectionEasting', 'DirectionNorthing', 'DirectionHeight',
+                                   'UpEasting', 'UpNorthing', 'UpHeight', 'Roll', 'Pitch', 'Yaw', 'Omega',
                                    'Phi', 'Kappa', 'CardinalDirection', 'CaptionConfidence']
                     for fieldFloat in fieldsFloat:
                         if fieldFloat in metaString:
                             metaString[fieldFloat] = float(metaString[fieldFloat])
-                        else: metaString[fieldFloat] = 0.0
+                        else:
+                            metaString[fieldFloat] = 0.0
 
                     # Fields that need to be converted to integers
-                    fieldsInt = ['CardinalNumber', 'ImageWidth', 'ImageHeight', 
+                    fieldsInt = ['CardinalNumber', 'ImageWidth', 'ImageHeight',
                                  'NumberOfCategories', 'NumberOfTags', 'NumberOfObjects']
                     for fieldInt in fieldsInt:
                         if fieldInt in metaString:
                             metaString[fieldInt] = int(metaString[fieldInt])
-                        else: metaString[fieldInt] = 0
+                        else:
+                            metaString[fieldInt] = 0
 
                     # Fields that must be strings
                     fieldsStr = ['Caption', 'CaptionConfidence', 'ImageWidth', 'ImageHeight', 'ImageFormat',
-                                 'ClipArtType', 'LineDrawingType', 'DominantColorForeground', 
+                                 'ClipArtType', 'LineDrawingType', 'DominantColorForeground',
                                  'DominantColorBackground', 'DominantColors', 'DescriptionTags']
                     for fieldStr in fieldsStr:
                         if fieldStr not in metaString:
                             metaString[fieldStr] = ''
 
-                            
                     # Loop through all detected categories (N=30) and populate fields
                     maxcats = 30
                     for mcat in range(maxcats):
@@ -865,7 +806,7 @@ class acvml(object):
                         if catName not in metaString:
                             metaString[catName] = ''
                             metaString[catScore] = 0.0
-                    
+
                     # Loop through all detection tags (N=30) and populate fields
                     maxtags = 30
                     for mtag in range(maxtags):
@@ -901,7 +842,7 @@ class acvml(object):
                             metaString[objH] = 0
                             metaString[objCX] = 0
                             metaString[objCY] = 0
-                            
+
                     # Populate scores, confidence, and object bounds
                     if metaString['NumberOfCategories'] >= 1:
                         for i in range(1, metaString['NumberOfCategories'] + 1):
@@ -925,7 +866,7 @@ class acvml(object):
                     # Create each geopoint for the geojson
                     gpoint = geojson.Point((metaString['Longitude'], metaString['Latitude']))
                     # Assemble each feature of the geojson
-                    gfeature = geojson.Feature(geometry = gpoint, properties = metaString)
+                    gfeature = geojson.Feature(geometry=gpoint, properties=metaString)
                     # Append the feature to the feature list
                     featList.append(gfeature)
             # Once all features are assembled and populated, create the final feature class geojson
@@ -936,4 +877,3 @@ class acvml(object):
         except Exception as ex:
             # Print the exception message
             print(ex.args[0])
-
