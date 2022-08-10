@@ -10,6 +10,7 @@ from decimal import Decimal
 
 import cv2
 import geojson
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import pyproj
@@ -23,6 +24,3 @@ from pandas.io.json import json_normalize
 from PIL import Image, ImageDraw, ImageFont
 from pytz import timezone
 from tqdm import tqdm
-
-# Set maximum number of http requests per page
-http.client._MAXHEADERS = 100000
