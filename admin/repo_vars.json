@@ -1,0 +1,8 @@
+{
+    "<PROJECT_TITLE>": "OCMLACV",
+    "<PROJECT_SUBTITLE>": "Orange County Machine Learning Azure Cognitive Vision for Photospheres",
+    "<PROJECT_DESCRIPTION>": "This is a repository for the Orange County Machine Learning Azure Cognitive Vision for Photospheres (OCMLACV) Project. It contains code and tools for the OCMLACV project. Uses Azure Cognitive Vision to analyze photospheres and extract information and object detection and recognition for 360-degree street-level imagery and LiDAR data. It also includes code for processing and analyzing the extracted information and object detection and recognition data. It also includes code for processing and analyzing the extracted information and object detection and recognition data.",
+    "<PROJECT_TAGS>": "GitHub, Python, ArcGIS, GIS, Azure Cognitive Vision, Photospheres, 360-degree street-level imagery, LiDAR data, Object detection and recognition, Orange County, California",
+    "<FOLDER>": "The folder name where the project files are stored.",
+    "<REPO_TYPE>": "ai-ml"
+}
